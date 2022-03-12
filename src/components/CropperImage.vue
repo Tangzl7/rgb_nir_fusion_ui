@@ -12,11 +12,13 @@
     import Cropper from 'cropperjs'
     import 'cropperjs/dist/cropper.css'
     import axios from 'axios'
-    import bus from '../../bus.ts'
 
     export default {
         data () {
             return {
+                rgb: null,
+                nir: null,
+                enhancement_0: null,
                 img: null,
                 myCropper: null,
                 crop_original_img: null,
@@ -26,6 +28,11 @@
 
         mounted() {
             this.img = this.$route.query.img;
+            this.rgb = this.$route.query.rgb;
+            this.nir = this.$route.query.nir;
+            this.enhancement_0 = this.$route.query.enhancement_0;
+            this.crop_original_img = this.$route.query.crop_original_img;
+            this.crop_enhance_img = this.$route.query.crop_enhance_img;
 
             this.$refs.image.addEventListener('load', () => {
                 if (this.myCropper) {
@@ -43,12 +50,6 @@
                     zoomOnWheel: false,
                 })
             });
-
-            // this.init();
-        },
-        onUnmounted() {
-            console.log(this.crop_original_img);
-            bus.emit('crop_original_img', this.crop_original_img)
         },
         methods: {
             save(){
@@ -61,7 +62,7 @@
                 let config = {
                     headers: {'Content-Type': 'multipart/form-data'}
                 };
-                let _this = this;
+                let _this =this;
                 if (this.$route.query.original == 1) {
                     axios.post('http://127.0.0.1:5590/original_crop_img', params, config)
                         .then(function (response) {
@@ -79,10 +80,29 @@
                 );
             },
             back() {
-                bus.emit('crop_original_img', this.crop_original_img)
-                this.$router.push({
-                    path: '/home',
-                });
+                if (this.$route.query.original == 1) {
+                    this.$router.push({
+                        path: '/home',
+                        query: {
+                            rgb: this.rgb,
+                            nir: this.nir,
+                            enhancement_0: this.enhancement_0,
+                            crop_original_img: this.crop_original_img,
+                            crop_enhance_img: this.crop_enhance_img,
+                        }
+                    });
+                } else {
+                    this.$router.push({
+                        path: '/home',
+                        query: {
+                            rgb: this.rgb,
+                            nir: this.nir,
+                            enhancement_0: this.enhancement_0,
+                            crop_original_img: this.crop_original_img,
+                            crop_enhance_img: this.crop_enhance_img,
+                        }
+                    });
+                }
             },
             base64ToBlob (code) {
                 let parts = code.split(';base64,');
