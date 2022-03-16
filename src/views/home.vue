@@ -7,7 +7,7 @@
                 @breakpoint="onBreakpoint"
         >
             <div class="logo" />
-            <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
+            <a-menu theme="dark" mode="inline" v-model:selectedKeys="selectedKeys" @click="to_menu">
                 <a-menu-item key="1">
                     <FileImageOutlined />
                     <span class="nav-text">{{nav_0}}</span>
@@ -30,7 +30,8 @@
             <a-layout-header :style="{ background: '#fff', padding: 0 }" />
             <a-layout-content :style="{ margin: '24px 16px 0' }">
                 <div :style="{ padding: '24px', background: '#fff', minHeight: '580px'}" :inline="true">
-                    <UploadImage></UploadImage>
+                    <DetailEnhance v-if="select_menu === '1'"></DetailEnhance>
+                    <Deblur v-if="select_menu === '4'"></Deblur>
                 </div>
             </a-layout-content>
             <a-layout-footer style="textAlign: center">
@@ -41,27 +42,36 @@
 </template>
 
 <script>
-    import UploadImage from '../components/DetailEnhance'
+    import { reactive, toRefs } from 'vue'
+    import DetailEnhance from '../components/DetailEnhance'
+    import Deblur from '../components/Deblur'
 
     export default {
         components: {
-            UploadImage
+            DetailEnhance,
+            Deblur
+        },
+        setup() {
+            const state = reactive({
+                selectedKeys: ['1']
+            });
+            return {
+                ...toRefs(state),
+            }
         },
         data() {
             return {
                 nav_0: "图像细节增强",
                 nav_1: "图像低光增亮",
                 nav_2: "图像去噪",
-                nav_3: "图像去模糊"
+                nav_3: "图像去模糊",
+                select_menu: '1',
             }
         },
         methods: {
-            onCollapse(collapsed, type) {
-                console.log(collapsed, type);
-            },
-            onBreakpoint(broken) {
-                console.log(broken);
-            },
+            to_menu({ item, key, keyPath }) {
+                this.select_menu = key
+            }
         }
     };
 </script>

@@ -13,7 +13,7 @@ const routes = [
         path: "/CropperImage",
         name: "CropperImage",
         component: CropperImage
-    }
+    },
 ];
 
 export const router = createRouter({

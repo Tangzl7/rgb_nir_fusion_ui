@@ -16,9 +16,6 @@
     export default {
         data () {
             return {
-                rgb: null,
-                nir: null,
-                enhancement_0: null,
                 img: null,
                 myCropper: null,
                 crop_original_img: null,
@@ -28,11 +25,6 @@
 
         mounted() {
             this.img = this.$route.query.img;
-            this.rgb = this.$route.query.rgb;
-            this.nir = this.$route.query.nir;
-            this.enhancement_0 = this.$route.query.enhancement_0;
-            this.crop_original_img = this.$route.query.crop_original_img;
-            this.crop_enhance_img = this.$route.query.crop_enhance_img;
 
             this.$refs.image.addEventListener('load', () => {
                 if (this.myCropper) {
@@ -59,6 +51,7 @@
                 let blob = this.base64ToBlob(crop_img);
                 let params = new FormData();
                 params.append('file', blob);
+                params.append('type', this.$route.query.type);
                 let config = {
                     headers: {'Content-Type': 'multipart/form-data'}
                 };
@@ -74,35 +67,12 @@
                             _this.crop_enhance_img = response.data.crop_img;
                         });
                 }
-                this.$message.success(
-                    'crop image success',
-                    3,
-                );
+                this.$message.success('crop image success', 3,);
             },
             back() {
-                if (this.$route.query.original == 1) {
-                    this.$router.push({
-                        path: '/home',
-                        query: {
-                            rgb: this.rgb,
-                            nir: this.nir,
-                            enhancement_0: this.enhancement_0,
-                            crop_original_img: this.crop_original_img,
-                            crop_enhance_img: this.crop_enhance_img,
-                        }
-                    });
-                } else {
-                    this.$router.push({
-                        path: '/home',
-                        query: {
-                            rgb: this.rgb,
-                            nir: this.nir,
-                            enhancement_0: this.enhancement_0,
-                            crop_original_img: this.crop_original_img,
-                            crop_enhance_img: this.crop_enhance_img,
-                        }
-                    });
-                }
+                this.$router.push({
+                    path: '/home',
+                });
             },
             base64ToBlob (code) {
                 let parts = code.split(';base64,');
