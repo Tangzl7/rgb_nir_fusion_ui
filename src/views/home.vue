@@ -31,6 +31,7 @@
             <a-layout-content :style="{ margin: '24px 16px 0' }">
                 <div :style="{ padding: '24px', background: '#fff', minHeight: '580px'}" :inline="true">
                     <DetailEnhance v-if="select_menu === '1'"></DetailEnhance>
+                    <Enlight v-if="select_menu === '2'"></Enlight>
                     <Denoise v-if="select_menu === '3'"></Denoise>
                     <Deblur v-if="select_menu === '4'"></Deblur>
                 </div>
@@ -47,12 +48,14 @@
     import DetailEnhance from '../components/DetailEnhance'
     import Deblur from '../components/Deblur'
     import Denoise from '../components/Denoise'
+    import Enlight from '../components/Enlight'
 
     export default {
         components: {
             DetailEnhance,
             Deblur,
-            Denoise
+            Denoise,
+            Enlight
         },
         setup() {
             const state = reactive({
