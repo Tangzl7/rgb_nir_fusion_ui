@@ -14,6 +14,8 @@
     "core-js": "^3.8.3",
     "cropper": "^4.1.0",
     "element-plus": "^2.0.5",
+    "jsplumb": "^2.15.6",
+    "leader-line": "^1.0.7",
     "mitt": "^3.0.0",
     "vue": "^3.2.13",
     "vue-cropper": "^0.5.8"
@@ -27,6 +29,7 @@
     "axios": "^0.26.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
+    "skeleton-loader": "^2.0.0",
     "vue-router": "^4.0.13"
   },
   "eslintConfig": {

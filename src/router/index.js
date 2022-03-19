@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router"
 const home = () => import("../views/home");
-const login = () => import("../views/login");
 const CropperImage = () => import("../components/CropperImage");
 
 const routes = [
