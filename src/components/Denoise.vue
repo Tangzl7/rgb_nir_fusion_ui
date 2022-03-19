@@ -131,7 +131,6 @@
             this.crop_original_img = 'http://127.0.0.1:5590/static/denoise/original_crop.png' + '?t=' + new Date().getTime();
             this.crop_enhance_img = 'http://127.0.0.1:5590/static/denoise/enhance_crop.png' + '?t=' + new Date().getTime();
             this.$refs.image.addEventListener('load', () => {
-                setTimeout(1000);
                 this.lineContainers[0] = new LeaderLine(
                     document.getElementById('noisy_rgb'),
                     document.getElementById('base')
