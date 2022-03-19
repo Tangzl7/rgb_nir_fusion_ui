@@ -66,8 +66,8 @@
         },
         methods: {
             to_menu({ item, key, keyPath }) {
-                if (this.select_menu === '1' && key !== '1')
-                    bus.emit('liner_destroy', true);
+                // if (this.select_menu === '1' && key !== '1')
+                bus.emit('liner_destroy', true);
                 this.select_menu = key;
             }
         }

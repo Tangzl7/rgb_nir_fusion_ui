@@ -51,7 +51,6 @@
     </a-row>
 
     <a-typography-title :strong="true" style="margin-left: 32%; margin-bottom: 4%; margin-top: 5%">Algorithm Workflow</a-typography-title>
-
     <a-row>
         <a-card hoverable style="width: 180px; margin-right: 0px" id="rgb_reflection">
             <template #cover>
@@ -99,9 +98,9 @@
         </a-card>
     </a-row>
 
-    <a-typography-title :strong="true" style="margin-left: 32%; margin-bottom: 4%; margin-top: 5%">Algorithm Introduce</a-typography-title>
-    <img :src="workflow" style="margin-left: 6%"/>
-    <AlgorithmIntroduce></AlgorithmIntroduce>
+<!--    <a-typography-title :strong="true" style="margin-left: 32%; margin-bottom: 4%; margin-top: 5%">Algorithm Introduce</a-typography-title>-->
+<!--    <img :src="workflow" style="margin-left: 6%"/>-->
+<!--    <AlgorithmIntroduce></AlgorithmIntroduce>-->
 
 </template>
 
