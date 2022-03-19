@@ -107,6 +107,7 @@
 
 <script>
     import axios from 'axios'
+    import bus from '../../bus.ts'
     import LeaderLine from 'leader-line'
     import AlgorithmIntroduce from './AlgorithmIntroduce'
 
@@ -134,6 +135,14 @@
             }
         },
         mounted() {
+            bus.on('liner_destroy', (event => {
+                if (event && this.lineContainers[0] != null) {
+                    for (var i = 0; i < 8; i++) {
+                        this.lineContainers[i].remove();
+                        this.lineContainers[i] = null;
+                    }
+                }
+            }));
             this.rgb = 'http://127.0.0.1:5590/static/detail_enhancement/rgb.png' + '?t=' + new Date().getTime();
             this.nir = 'http://127.0.0.1:5590/static/detail_enhancement/nir.png' + '?t=' + new Date().getTime();
             this.enhancement = 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png' + '?t=' + new Date().getTime();
@@ -200,7 +209,6 @@
                     })
             },
             rgb_to_crop_page() {
-                this.lineContainer.remove();
                 this.$router.push({
                     path: '/CropperImage',
                     query: {

@@ -32,6 +32,7 @@
 
 <script>
     import { reactive, toRefs } from 'vue'
+    import bus from '../../bus.ts'
     import DetailEnhance from '../components/DetailEnhance'
     import Deblur from '../components/Deblur'
     import Denoise from '../components/Denoise'
@@ -65,7 +66,9 @@
         },
         methods: {
             to_menu({ item, key, keyPath }) {
-                this.select_menu = key
+                if (this.select_menu === '1' && key !== '1')
+                    bus.emit('liner_destroy', true);
+                this.select_menu = key;
             }
         }
     };
