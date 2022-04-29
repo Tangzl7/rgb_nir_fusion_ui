@@ -44,7 +44,7 @@
             <template #cover>
                 <img alt="example" :src="crop_enhance_img" height="380" width="570" ref="image" />
             </template>
-            <a-button type="primary" style="margin-left: 38%;" @click="rgb_to_crop_page">
+            <a-button type="primary" style="margin-left: 38%;" @click="enhance_to_crop_page">
                 <template #icon><SearchOutlined /></template>增强图像裁剪
             </a-button>
         </a-card>
