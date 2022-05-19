@@ -4,6 +4,10 @@ const CropperImage = () => import("../components/CropperImage");
 
 const routes = [
     {
+        path: "/",
+        redirect: '/home',
+    },
+    {
         path: "/home",
         name: "home",
         component: home

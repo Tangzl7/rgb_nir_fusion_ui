@@ -1,7 +1,7 @@
 <template>
     <a-typography-title :strong="true" style="margin-left: 35%; margin-bottom: 4%">Algorithm Test</a-typography-title>
     <a-row>
-        <a-card hoverable style="width: 360px; margin-right: 60px">
+        <a-card hoverable style="width: 28%; margin-right: 5%">
             <template #cover>
                 <img alt="example" :src="rgb" ref="image"/>
             </template>
@@ -11,7 +11,7 @@
             </a-upload>
         </a-card>
 
-        <a-card hoverable style="width: 360px; margin-right: 60px">
+        <a-card hoverable style="width: 28%; margin-right: 5%">
             <template #cover>
                 <img alt="example" :src="nir" ref="image"/>
             </template>
@@ -21,7 +21,7 @@
             </a-upload>
         </a-card>
 
-        <a-card hoverable style="width: 360px; margin-right: 20px">
+        <a-card hoverable style="width: 28%">
             <template #cover>
                 <img alt="fusion result" :src=enhancement @click="enhance_to_crop_page" ref="image" />
             </template>
@@ -29,19 +29,20 @@
             <a-button type="primary" style="margin-top: 5%;" @click="enhance">运行算法</a-button>
         </a-card>
     </a-row>
+
     <a-typography-title :strong="true" style="margin-left: 32%; margin-bottom: 4%; margin-top: 5%">Original VS Enhanced</a-typography-title>
-    <a-row style="margin-top: 50px">
-        <a-card hoverable>
+    <a-row style="margin-top: 2%">
+        <a-card hoverable style="width: 45%">
             <template #cover>
-                <img alt="example" :src="crop_original_img" height="380" width="570" ref="image" />
+                <img alt="example" :src="crop_original_img" ref="image" />
             </template>
             <a-button type="primary" style="margin-left: 40%;" @click="rgb_to_crop_page">
                 <template #icon><SearchOutlined /></template>原图裁剪
             </a-button>
         </a-card>
-        <a-card hoverable style="margin-left: 5%">
+        <a-card hoverable style="width: 45%; margin-left: 5%">
             <template #cover>
-                <img alt="example" :src="crop_enhance_img" height="380" width="570" ref="image" />
+                <img alt="example" :src="crop_enhance_img" ref="image" />
             </template>
             <a-button type="primary" style="margin-left: 38%;" @click="enhance_to_crop_page">
                 <template #icon><SearchOutlined /></template>增强图像裁剪
@@ -50,40 +51,40 @@
     </a-row>
 
     <a-typography-title :strong="true" style="margin-left: 32%; margin-bottom: 4%; margin-top: 5%">Algorithm Workflow</a-typography-title>
-    <a-row>
-        <a-card hoverable style="width: 200px; margin-right: 0px" id="rgb">
+    <a-row style="margin-left: 5%">
+        <a-card hoverable style="width: 14%" id="rgb">
             <template #cover>
                 <img alt="fusion result" :src=rgb ref="image" />
             </template>
             <a-card-meta title="RGB Image"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 200px; margin-left: 20%;" id="init_illumination">
+        <a-card hoverable style="width: 14%; margin-left: 20%" id="init_illumination">
             <template #cover>
                 <img alt="fusion result" :src=init_illumination ref="image" />
             </template>
             <a-card-meta title="Init Illumination"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 200px; margin-left: 20%;" id="enhancement">
+        <a-card hoverable style="width: 14%; margin-left: 20%" id="enhancement">
             <template #cover>
                 <img alt="fusion result" :src=enhancement ref="image" />
             </template>
             <a-card-meta title="Enhancement"></a-card-meta>
         </a-card>
     </a-row>
-    <a-row>
-        <a-card hoverable style="width: 200px; margin-top: 3%" id="nir">
+    <a-row style="margin-left: 5%">
+        <a-card hoverable style="width: 14%; margin-top: 3%" id="nir">
             <template #cover>
                 <img alt="fusion result" :src=nir ref="image" />
             </template>
             <a-card-meta title="NIR Image"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 200px; margin-top: 3%; margin-left: 20%;" id="illumination">
+        <a-card hoverable style="width: 14%; margin-top: 3%; margin-left: 20%;" id="illumination">
             <template #cover>
                 <img alt="fusion result" :src=illumination ref="image" />
             </template>
             <a-card-meta title="Illumination"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 200px; margin-left: 20%; margin-top: 3%;" id="init_enhancement">
+        <a-card hoverable style="width: 14%; margin-left: 20%; margin-top: 3%;" id="init_enhancement">
             <template #cover>
                 <img alt="fusion result" :src=init_enhancement ref="image" />
             </template>
@@ -174,7 +175,13 @@
                 axios.get('http://127.0.0.1:5590/enlight')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png' + '?t=' + new Date().getTime();
-                    })
+                    });
+                if (this.lineContainers[0] != null) {
+                    for (var i = 0; i < 5; i++) {
+                        this.lineContainers[i].remove();
+                        this.lineContainers[i] = null;
+                    }
+                }
             },
             rgb_to_crop_page() {
                 this.$router.push({
