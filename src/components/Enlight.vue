@@ -52,43 +52,57 @@
 
     <a-typography-title :strong="true" style="margin-left: 32%; margin-bottom: 4%; margin-top: 5%">Algorithm Workflow</a-typography-title>
     <a-row style="margin-left: 5%">
-        <a-card hoverable style="width: 14%" id="rgb">
+        <a-card hoverable style="width: 14%; margin-left: 42%" id="reflection_model">
             <template #cover>
-                <img alt="fusion result" :src=rgb ref="image" />
+                <img :src=reflection_model ref="image" />
             </template>
-            <a-card-meta title="RGB Image"></a-card-meta>
+            <a-card-meta title="Reflection Model"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 14%; margin-left: 20%" id="init_illumination">
+        <a-card hoverable style="width: 14%; margin-left: 18%" id="result1">
             <template #cover>
-                <img alt="fusion result" :src=init_illumination ref="image" />
+                <img :src=result1 ref="image" />
             </template>
-            <a-card-meta title="Init Illumination"></a-card-meta>
+            <a-card-meta title="Init Fusion"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 14%; margin-left: 20%" id="enhancement">
+    </a-row>
+    <a-row style="margin-left: 1%">
+        <a-card hoverable style="width: 14%; margin-top: 3%" id="rgb">
             <template #cover>
-                <img alt="fusion result" :src=enhancement ref="image" />
+                <img :src=rgb ref="image" />
             </template>
-            <a-card-meta title="Enhancement"></a-card-meta>
+            <a-card-meta title="RGB"></a-card-meta>
+        </a-card>
+        <a-card hoverable style="width: 14%; margin-top: 3%" id="nir">
+            <template #cover>
+                <img :src=nir ref="image" />
+            </template>
+            <a-card-meta title="NIR"></a-card-meta>
+        </a-card>
+        <a-card hoverable style="width: 14%; margin-top: 3%; margin-left: 16%" id="illumination">
+            <template #cover>
+                <img :src=illumination ref="image" />
+            </template>
+            <a-card-meta title="Illumination Map"></a-card-meta>
+        </a-card>
+        <a-card hoverable style="width: 14%; margin-top: 3%; margin-left: 17%" id="result2">
+            <template #cover>
+                <img :src=result1 ref="image" />
+            </template>
+            <a-card-meta title="Enlight Map"></a-card-meta>
         </a-card>
     </a-row>
     <a-row style="margin-left: 5%">
-        <a-card hoverable style="width: 14%; margin-top: 3%" id="nir">
+        <a-card hoverable style="width: 14%; margin-top: 3%; margin-left: 42%;" id="dense_map">
             <template #cover>
-                <img alt="fusion result" :src=nir ref="image" />
+                <img :src=dense_map ref="image" />
             </template>
-            <a-card-meta title="NIR Image"></a-card-meta>
+            <a-card-meta title="Haze Map"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 14%; margin-top: 3%; margin-left: 20%;" id="illumination">
+        <a-card hoverable style="width: 14%; margin-left: 18%; margin-top: 3%;" id="enhancement">
             <template #cover>
-                <img alt="fusion result" :src=illumination ref="image" />
+                <img :src=enhancement ref="image" />
             </template>
-            <a-card-meta title="Illumination"></a-card-meta>
-        </a-card>
-        <a-card hoverable style="width: 14%; margin-left: 20%; margin-top: 3%;" id="init_enhancement">
-            <template #cover>
-                <img alt="fusion result" :src=init_enhancement ref="image" />
-            </template>
-            <a-card-meta title="Init Enhancement"></a-card-meta>
+            <a-card-meta title="Enhancement"></a-card-meta>
         </a-card>
     </a-row>
 </template>
@@ -102,12 +116,14 @@
         name: "Enlight",
         data() {
             return {
-                lineContainers: [null, null, null, null, null],
+                lineContainers: [null, null, null, null, null, null, null, null, null, null, null],
                 rgb: 'http://127.0.0.1:5590/static/low_light_enhancement/rgb.png',
                 nir: 'http://127.0.0.1:5590/static/low_light_enhancement/nir.png',
-                init_illumination: 'http://127.0.0.1:5590/static/low_light_enhancement/init_illumination.png',
+                reflection_model: 'http://127.0.0.1:5590/static/low_light_enhancement/reflection_model.png',
                 illumination: 'http://127.0.0.1:5590/static/low_light_enhancement/illumination.png',
-                init_enhancement: 'http://127.0.0.1:5590/static/low_light_enhancement/init_enhancement.png',
+                dense_map: 'http://127.0.0.1:5590/static/low_light_enhancement/dense_map.png',
+                result1: 'http://127.0.0.1:5590/static/low_light_enhancement/result1.png',
+                result2: 'http://127.0.0.1:5590/static/low_light_enhancement/result2.png',
                 enhancement: 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png',
                 crop_original_img: 'http://127.0.0.1:5590/static/low_light_enhancement/original_crop.png',
                 crop_enhance_img: 'http://127.0.0.1:5590/static/low_light_enhancement/enhance_crop.png',
@@ -116,39 +132,51 @@
         mounted() {
             bus.on('liner_destroy', (event => {
                 if (event && this.lineContainers[0] != null) {
-                    for (var i = 0; i < 6; i++) {
+                    for (var i = 0; i < 11; i++) {
                         this.lineContainers[i].remove();
                         this.lineContainers[i] = null;
                     }
                 }
             }));
-            this.rgb = 'http://127.0.0.1:5590/static/low_light_enhancement/rgb.png' + '?t=' + new Date().getTime();
-            this.nir = 'http://127.0.0.1:5590/static/low_light_enhancement/nir.png' + '?t=' + new Date().getTime();
-            this.init_illumination = 'http://127.0.0.1:5590/static/low_light_enhancement/init_illumination.png' + '?t=' + new Date().getTime();
-            this.illumination = 'http://127.0.0.1:5590/static/low_light_enhancement/illumination.png' + '?t=' + new Date().getTime();
-            this.init_enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/init_enhancement.png' + '?t=' + new Date().getTime();
-            this.enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png' + '?t=' + new Date().getTime();
-            this.crop_original_img = 'http://127.0.0.1:5590/static/low_light_enhancement/original_crop.png' + '?t=' + new Date().getTime();
-            this.crop_enhance_img = 'http://127.0.0.1:5590/static/low_light_enhancement/enhance_crop.png' + '?t=' + new Date().getTime();
+            // this.rgb = 'http://127.0.0.1:5590/static/low_light_enhancement/rgb.png' + '?t=' + new Date().getTime();
+            // this.nir = 'http://127.0.0.1:5590/static/low_light_enhancement/nir.png' + '?t=' + new Date().getTime();
+            // this.reflection_model = 'http://127.0.0.1:5590/static/low_light_enhancement/reflection_model.png' + '?t=' + new Date().getTime();
+            // this.illumination = 'http://127.0.0.1:5590/static/low_light_enhancement/illumination.png' + '?t=' + new Date().getTime();
+            // this.init_enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/init_enhancement.png' + '?t=' + new Date().getTime();
+            // this.enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png' + '?t=' + new Date().getTime();
+            // this.crop_original_img = 'http://127.0.0.1:5590/static/low_light_enhancement/original_crop.png' + '?t=' + new Date().getTime();
+            // this.crop_enhance_img = 'http://127.0.0.1:5590/static/low_light_enhancement/enhance_crop.png' + '?t=' + new Date().getTime();
             this.$refs.image.addEventListener('load', () => {
                 this.lineContainers[0] = new LeaderLine(
-                    document.getElementById('rgb'),
-                    document.getElementById('init_illumination')
+                    document.getElementById('nir'),
+                    document.getElementById('reflection_model')
                 );
                 this.lineContainers[1] = new LeaderLine(
-                    document.getElementById('init_illumination'),
+                    document.getElementById('nir'),
                     document.getElementById('illumination')
                 );
                 this.lineContainers[2] = new LeaderLine(
                     document.getElementById('nir'),
-                    document.getElementById('illumination')
+                    document.getElementById('dense_map')
                 );
                 this.lineContainers[3] = new LeaderLine(
-                    document.getElementById('illumination'),
-                    document.getElementById('init_enhancement')
+                    document.getElementById('reflection_model'),
+                    document.getElementById('result1')
                 );
                 this.lineContainers[4] = new LeaderLine(
-                    document.getElementById('init_enhancement'),
+                    document.getElementById('illumination'),
+                    document.getElementById('result2')
+                );
+                this.lineContainers[5] = new LeaderLine(
+                    document.getElementById('result1'),
+                    document.getElementById('result2')
+                );
+                this.lineContainers[6] = new LeaderLine(
+                    document.getElementById('dense_map'),
+                    document.getElementById('enhancement')
+                );
+                this.lineContainers[7] = new LeaderLine(
+                    document.getElementById('result2'),
                     document.getElementById('enhancement')
                 );
             });
