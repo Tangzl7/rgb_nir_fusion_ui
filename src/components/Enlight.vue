@@ -105,18 +105,33 @@
             <a-card-meta title="Enhancement"></a-card-meta>
         </a-card>
     </a-row>
+
+    <div v-if="show" style="margin-right: 8%; margin-top: 5%">
+        <a-typography-title :strong="true" style="margin-left: 42%; margin-bottom: 4%">Crop Image</a-typography-title>
+        <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
+    </div>
+
 </template>
 
 <script>
     import axios from 'axios'
     import bus from '../../bus.ts'
     import LeaderLine from 'leader-line'
+    import CropperImage from '../components/CropperImage'
 
     export default {
         name: "Enlight",
+        components: {
+            CropperImage
+        },
         data() {
             return {
+                show: false,
                 lineContainers: [null, null, null, null, null, null, null, null, null, null, null],
+                crop_img: null,
+                img_type: null,
+                enhance_type: null,
+
                 rgb: 'http://127.0.0.1:5590/static/low_light_enhancement/rgb.png',
                 nir: 'http://127.0.0.1:5590/static/low_light_enhancement/nir.png',
                 reflection_model: 'http://127.0.0.1:5590/static/low_light_enhancement/reflection_model.png',
@@ -131,21 +146,8 @@
         },
         mounted() {
             bus.on('liner_destroy', (event => {
-                if (event && this.lineContainers[0] != null) {
-                    for (var i = 0; i < 11; i++) {
-                        this.lineContainers[i].remove();
-                        this.lineContainers[i] = null;
-                    }
-                }
+                this.line_remove();
             }));
-            // this.rgb = 'http://127.0.0.1:5590/static/low_light_enhancement/rgb.png' + '?t=' + new Date().getTime();
-            // this.nir = 'http://127.0.0.1:5590/static/low_light_enhancement/nir.png' + '?t=' + new Date().getTime();
-            // this.reflection_model = 'http://127.0.0.1:5590/static/low_light_enhancement/reflection_model.png' + '?t=' + new Date().getTime();
-            // this.illumination = 'http://127.0.0.1:5590/static/low_light_enhancement/illumination.png' + '?t=' + new Date().getTime();
-            // this.init_enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/init_enhancement.png' + '?t=' + new Date().getTime();
-            // this.enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png' + '?t=' + new Date().getTime();
-            // this.crop_original_img = 'http://127.0.0.1:5590/static/low_light_enhancement/original_crop.png' + '?t=' + new Date().getTime();
-            // this.crop_enhance_img = 'http://127.0.0.1:5590/static/low_light_enhancement/enhance_crop.png' + '?t=' + new Date().getTime();
             this.$refs.image.addEventListener('load', () => {
                 this.lineContainers[0] = new LeaderLine(
                     document.getElementById('nir'),
@@ -203,33 +205,57 @@
                 axios.get('http://127.0.0.1:5590/enlight')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png' + '?t=' + new Date().getTime();
+                        _this.reflection_model = 'http://127.0.0.1:5590/static/low_light_enhancement/reflection_model.png' + '?t=' + new Date().getTime();
+                        _this.illumination = 'http://127.0.0.1:5590/static/low_light_enhancement/illumination.png' + '?t=' + new Date().getTime();
+                        _this.dense_map = 'http://127.0.0.1:5590/static/low_light_enhancement/dense_map.png' + '?t=' + new Date().getTime();
+                        _this.result1 = 'http://127.0.0.1:5590/static/low_light_enhancement/result1.png' + '?t=' + new Date().getTime();
+                        _this.result = 'http://127.0.0.1:5590/static/low_light_enhancement/result2.png' + '?t=' + new Date().getTime();
                     });
+                this.line_remove();
+            },
+            rgb_to_crop_page() {
+                this.crop_img = this.rgb;
+                this.img_type = 0;
+                this.enhance_type = 'low_light_enhancement';
+                this.show = true;
+                this.$nextTick(()=>{
+                    this.to_bottom()
+                })
+            },
+            enhance_to_crop_page() {
+                this.crop_img = this.enhancement;
+                this.img_type = 1;
+                this.enhance_type = 'low_light_enhancement';
+                this.show = true;
+                this.$nextTick(()=>{
+                    this.to_bottom()
+                })
+            },
+            line_remove() {
                 if (this.lineContainers[0] != null) {
-                    for (var i = 0; i < 5; i++) {
+                    for (var i = 0; i < 8; i++) {
                         this.lineContainers[i].remove();
                         this.lineContainers[i] = null;
                     }
                 }
             },
-            rgb_to_crop_page() {
-                this.$router.push({
-                    path: '/CropperImage',
-                    query: {
-                        type: 'low_light_enhancement',
-                        img: this.rgb,
-                        original: 1,
-                    }
+            back_home(flag) {
+                this.show = !this.show;
+                if (flag === 0)
+                    this.crop_original_img = 'http://127.0.0.1:5590/static/low_light_enhancement/original_crop.png' + '?t=' + new Date().getTime();
+                else
+                    this.crop_enhance_img = 'http://127.0.0.1:5590/static/low_light_enhancement/enhance_crop.png' + '?t=' + new Date().getTime();
+                this.$nextTick(()=>{
+                    this.to_back()
                 })
             },
-            enhance_to_crop_page() {
-                this.$router.push({
-                    path: '/CropperImage',
-                    query: {
-                        type: 'low_light_enhancement',
-                        img: this.enhancement,
-                        original: 0,
-                    }
-                });
+            to_bottom(){
+                var height = document.body.clientHeight;
+                window.scroll({ top: height*3, left: 0, behavior: 'smooth' });
+            },
+            to_back() {
+                var height = document.body.clientHeight;
+                window.scroll({ top: height, left: 0, behavior: 'smooth' });
             }
         },
     }

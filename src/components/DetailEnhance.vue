@@ -100,6 +100,10 @@
             <a-card-meta title="Enhancement"></a-card-meta>
         </a-card>
     </a-row>
+    <div v-if="show" style="margin-right: 8%; margin-top: 5%">
+        <a-typography-title :strong="true" style="margin-left: 42%; margin-bottom: 4%">Crop Image</a-typography-title>
+        <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
+    </div>
 
 </template>
 
@@ -108,15 +112,21 @@
     import bus from '../../bus.ts'
     import LeaderLine from 'leader-line'
     import AlgorithmIntroduce from './AlgorithmIntroduce'
+    import CropperImage from '../components/CropperImage'
 
     export default {
         name: "DetailEnhance",
         components: {
-            AlgorithmIntroduce
+            AlgorithmIntroduce,
+            CropperImage
         },
         data() {
             return {
+                show: false,
                 lineContainers: [null, null, null, null, null, null, null, null],
+                crop_img: null,
+                img_type: null,
+                enhance_type: null,
                 rgb: 'http://127.0.0.1:5590/static/detail_enhancement/rgb.png',
                 nir: 'http://127.0.0.1:5590/static/detail_enhancement/nir.png',
                 enhancement: 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png',
@@ -132,19 +142,68 @@
         },
         mounted() {
             bus.on('liner_destroy', (event => {
-                if (event && this.lineContainers[0] != null) {
+                this.line_remove();
+            }));
+            this.$refs.image.addEventListener('load', () => {
+                this.line_set();
+            });
+        },
+        methods: {
+            rgbHandleChange(info) {
+                if (info.file.status === 'done') {
+                    this.$message.success(`${info.file.name} file uploaded successfully`);
+                    this.rgb = 'http://127.0.0.1:5590/static/detail_enhancement/rgb.png' + '?t=' + new Date().getTime();
+                } else if (info.file.status === 'error') {
+                    this.$message.error(`${info.file.name} file upload failed.`);
+                }
+            },
+            nirHandleChange(info) {
+                if (info.file.status === 'done') {
+                    this.$message.success(`${info.file.name} file uploaded successfully`);
+                    this.nir = 'http://127.0.0.1:5590/static/detail_enhancement/nir.png' + '?t=' + new Date().getTime();
+                } else if (info.file.status === 'error') {
+                    this.$message.error(`${info.file.name} file upload failed.`);
+                }
+            },
+            enhance() {
+                let _this = this;
+                axios.get('http://127.0.0.1:5590/enhancement')
+                    .then(function () {
+                        _this.enhancement = 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png' + '?t=' + new Date().getTime();
+                        _this.r_reflection_weight = 'http://127.0.0.1:5590/static/detail_enhancement/r_reflection_weight.png' + '?t=' + new Date().getTime();
+                        _this.r_gradient_map = 'http://127.0.0.1:5590/static/detail_enhancement/r_gradient_map.png' + '?t=' + new Date().getTime();
+                        _this.r_transmission_weight = 'http://127.0.0.1:5590/static/detail_enhancement/r_transmission_weight.png' + '?t=' + new Date().getTime();
+                        _this.init_fusion = 'http://127.0.0.1:5590/static/detail_enhancement/init_fusion.png' + '?t=' + new Date().getTime();
+                    });
+                this.line_remove();
+            },
+            rgb_to_crop_page() {
+                this.crop_img = this.rgb;
+                this.img_type = 0;
+                this.enhance_type = 'detail_enhancement';
+                this.show = true;
+                this.$nextTick(()=>{
+                    this.to_bottom()
+                })
+            },
+            enhance_to_crop_page() {
+                this.crop_img = this.enhancement;
+                this.img_type = 1;
+                this.enhance_type = 'detail_enhancement';
+                this.show = true;
+                this.$nextTick(()=>{
+                    this.to_bottom()
+                })
+            },
+            line_remove() {
+                if (this.lineContainers[0] != null) {
                     for (var i = 0; i < 8; i++) {
                         this.lineContainers[i].remove();
                         this.lineContainers[i] = null;
                     }
                 }
-            }));
-            this.rgb = 'http://127.0.0.1:5590/static/detail_enhancement/rgb.png' + '?t=' + new Date().getTime();
-            this.nir = 'http://127.0.0.1:5590/static/detail_enhancement/nir.png' + '?t=' + new Date().getTime();
-            this.enhancement = 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png' + '?t=' + new Date().getTime();
-            this.crop_original_img = 'http://127.0.0.1:5590/static/detail_enhancement/original_crop.png' + '?t=' + new Date().getTime();
-            this.crop_enhance_img = 'http://127.0.0.1:5590/static/detail_enhancement/enhance_crop.png' + '?t=' + new Date().getTime();
-            this.$refs.image.addEventListener('load', () => {
+            },
+            line_set() {
                 this.lineContainers[0] = new LeaderLine(
                     document.getElementById('rgb_reflection'),
                     document.getElementById('reflection_weights')
@@ -177,63 +236,24 @@
                     document.getElementById('init_fusion'),
                     document.getElementById('enhancement')
                 );
-            });
-        },
-        methods: {
-            rgbHandleChange(info) {
-                if (info.file.status === 'done') {
-                    this.$message.success(`${info.file.name} file uploaded successfully`);
-                    this.rgb = 'http://127.0.0.1:5590/static/detail_enhancement/rgb.png' + '?t=' + new Date().getTime();
-                    console.log(this.rgb)
-                } else if (info.file.status === 'error') {
-                    this.$message.error(`${info.file.name} file upload failed.`);
-                }
             },
-            nirHandleChange(info) {
-                if (info.file.status === 'done') {
-                    this.$message.success(`${info.file.name} file uploaded successfully`);
-                    this.nir = 'http://127.0.0.1:5590/static/detail_enhancement/nir.png' + '?t=' + new Date().getTime();
-                } else if (info.file.status === 'error') {
-                    this.$message.error(`${info.file.name} file upload failed.`);
-                }
-            },
-            enhance() {
-                let _this = this;
-                axios.get('http://127.0.0.1:5590/enhancement')
-                    .then(function () {
-                        _this.enhancement = 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png' + '?t=' + new Date().getTime();
-                        _this.r_reflection_weight = 'http://127.0.0.1:5590/static/detail_enhancement/r_reflection_weight.png' + '?t=' + new Date().getTime();
-                        _this.r_gradient_map = 'http://127.0.0.1:5590/static/detail_enhancement/r_gradient_map.png' + '?t=' + new Date().getTime();
-                        _this.r_transmission_weight = 'http://127.0.0.1:5590/static/detail_enhancement/r_transmission_weight.png' + '?t=' + new Date().getTime();
-                        _this.init_fusion = 'http://127.0.0.1:5590/static/detail_enhancement/init_fusion.png' + '?t=' + new Date().getTime();
-                    });
-                if (this.lineContainers[0] != null) {
-                    for (var i = 0; i < 8; i++) {
-                        this.lineContainers[i].remove();
-                        this.lineContainers[i] = null;
-                    }
-                }
-            },
-            rgb_to_crop_page() {
-                this.$router.push({
-                    path: '/CropperImage',
-                    query: {
-                        type: 'detail_enhancement',
-                        img: this.rgb,
-                        original: 1,
-                    }
+            back_home(flag) {
+                this.show = !this.show;
+                if (flag === 0)
+                    this.crop_original_img = 'http://127.0.0.1:5590/static/detail_enhancement/original_crop.png' + '?t=' + new Date().getTime();
+                else
+                    this.crop_enhance_img = 'http://127.0.0.1:5590/static/detail_enhancement/enhance_crop.png' + '?t=' + new Date().getTime();
+                this.$nextTick(()=>{
+                    this.to_back()
                 })
             },
-            enhance_to_crop_page() {
-                // this.lineContainer.remove();
-                this.$router.push({
-                    path: '/CropperImage',
-                    query: {
-                        type: 'detail_enhancement',
-                        img: this.enhancement,
-                        original: 0,
-                    }
-                });
+            to_bottom(){
+                var height = document.body.clientHeight;
+                window.scroll({ top: height*3, left: 0, behavior: 'smooth' });
+            },
+            to_back() {
+                var height = document.body.clientHeight;
+                window.scroll({ top: height, left: 0, behavior: 'smooth' });
             }
         },
     }

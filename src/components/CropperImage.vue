@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="img-container">
-            <img :src="img" ref="image" alt="">
+            <img :src="img" style="width: 1024px; height: 680px" ref="image" alt="">
         </div>
     </div>
     <a-button class="button"  @click="save" style="padding-top: 8px; padding-bottom: 30px; background: gray; width: 50%">crop</a-button>
@@ -12,11 +12,29 @@
     import Cropper from 'cropperjs'
     import 'cropperjs/dist/cropper.css'
     import axios from 'axios'
+    import bus from '../../bus.ts'
 
     export default {
+        name: 'CropperImage',
+        props: {
+            crop_img: {
+                type: String,
+            },
+            img_type: {
+                type: Number
+            },
+            enhance_type: {
+                type: String,
+            },
+            back_home: {
+                type: Function,
+            }
+        },
         data () {
             return {
-                img: null,
+                img: this.crop_img,
+                type1: this.img_type,
+                type2: this.enhance_type,
                 myCropper: null,
                 crop_original_img: null,
                 crop_enhance_img: null
@@ -24,7 +42,7 @@
         },
 
         mounted() {
-            this.img = this.$route.query.img;
+            // this.img = this.$route.query.img;
 
             this.$refs.image.addEventListener('load', () => {
                 if (this.myCropper) {
@@ -51,12 +69,12 @@
                 let blob = this.base64ToBlob(crop_img);
                 let params = new FormData();
                 params.append('file', blob);
-                params.append('type', this.$route.query.type);
+                params.append('type', this.type2);
                 let config = {
                     headers: {'Content-Type': 'multipart/form-data'}
                 };
                 let _this =this;
-                if (this.$route.query.original == 1) {
+                if (this.type1 === 0) {
                     axios.post('http://127.0.0.1:5590/original_crop_img', params, config)
                         .then(function (response) {
                             _this.crop_original_img = response.data.crop_img;
@@ -70,9 +88,7 @@
                 this.$message.success('crop image success', 3,);
             },
             back() {
-                this.$router.push({
-                    path: '/home',
-                });
+                this.back_home(this.type1);
             },
             base64ToBlob (code) {
                 let parts = code.split(';base64,');

@@ -93,18 +93,33 @@
             <a-card-meta title="Detail Image"></a-card-meta>
         </a-card>
     </a-row>
+
+    <div v-if="show" style="margin-right: 8%; margin-top: 5%">
+        <a-typography-title :strong="true" style="margin-left: 42%; margin-bottom: 4%">Crop Image</a-typography-title>
+        <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
+    </div>
+
 </template>
 
 <script>
     import axios from 'axios'
     import bus from '../../bus.ts'
     import LeaderLine from 'leader-line'
+    import CropperImage from '../components/CropperImage'
 
     export default {
         name: "Denoise",
+        components: {
+            CropperImage
+        },
         data() {
             return {
+                show: false,
                 lineContainers: [null, null, null, null, null, null, null],
+                crop_img: null,
+                img_type: null,
+                enhance_type: null,
+
                 rgb: 'http://127.0.0.1:5590/static/denoise/rgb.png',
                 nir: 'http://127.0.0.1:5590/static/denoise/nir.png',
                 base: 'http://127.0.0.1:5590/static/denoise/base.png',
@@ -117,21 +132,8 @@
         },
         mounted() {
             bus.on('liner_destroy', (event => {
-                if (event && this.lineContainers[0] != null) {
-                    for (var i = 0; i < 7; i++) {
-                        this.lineContainers[i].remove();
-                        this.lineContainers[i] = null;
-                    }
-                }
+                this.line_remove();
             }));
-            this.rgb = 'http://127.0.0.1:5590/static/denoise/rgb.png' + '?t=' + new Date().getTime();
-            this.nir = 'http://127.0.0.1:5590/static/denoise/nir.png' + '?t=' + new Date().getTime();
-            this.base = 'http://127.0.0.1:5590/static/denoise/base.png' + '?t=' + new Date().getTime();
-            this.noise_reduce = 'http://127.0.0.1:5590/static/denoise/noise_reduce.png' + '?t=' + new Date().getTime();
-            this.detail = 'http://127.0.0.1:5590/static/denoise/detail.png' + '?t=' + new Date().getTime();
-            this.enhancement = 'http://127.0.0.1:5590/static/denoise/enhancement.png' + '?t=' + new Date().getTime();
-            this.crop_original_img = 'http://127.0.0.1:5590/static/denoise/original_crop.png' + '?t=' + new Date().getTime();
-            this.crop_enhance_img = 'http://127.0.0.1:5590/static/denoise/enhance_crop.png' + '?t=' + new Date().getTime();
             this.$refs.image.addEventListener('load', () => {
                 this.lineContainers[0] = new LeaderLine(
                     document.getElementById('noisy_rgb'),
@@ -185,7 +187,31 @@
                 axios.get('http://127.0.0.1:5590/denoise')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/denoise/enhancement.png' + '?t=' + new Date().getTime();
+                        _this.base = 'http://127.0.0.1:5590/static/denoise/base.png' + '?t=' + new Date().getTime();
+                        _this.noise_reduce = 'http://127.0.0.1:5590/static/denoise/noise_reduce.png' + '?t=' + new Date().getTime();
+                        _this.detail = 'http://127.0.0.1:5590/static/denoise/detail.png' + '?t=' + new Date().getTime();
                     });
+                this.line_remove();
+            },
+            rgb_to_crop_page() {
+                this.crop_img = this.rgb;
+                this.img_type = 0;
+                this.enhance_type = 'denoise';
+                this.show = true;
+                this.$nextTick(()=>{
+                    this.to_bottom()
+                })
+            },
+            enhance_to_crop_page() {
+                this.crop_img = this.enhancement;
+                this.img_type = 1;
+                this.enhance_type = 'denoise';
+                this.show = true;
+                this.$nextTick(()=>{
+                    this.to_bottom()
+                })
+            },
+            line_remove() {
                 if (this.lineContainers[0] != null) {
                     for (var i = 0; i < 7; i++) {
                         this.lineContainers[i].remove();
@@ -193,25 +219,23 @@
                     }
                 }
             },
-            rgb_to_crop_page() {
-                this.$router.push({
-                    path: '/CropperImage',
-                    query: {
-                        type: 'denoise',
-                        img: this.rgb,
-                        original: 1,
-                    }
+            back_home(flag) {
+                this.show = !this.show;
+                if (flag === 0)
+                    this.crop_original_img = 'http://127.0.0.1:5590/static/denoise/original_crop.png' + '?t=' + new Date().getTime();
+                else
+                    this.crop_enhance_img = 'http://127.0.0.1:5590/static/denoise/enhance_crop.png' + '?t=' + new Date().getTime();
+                this.$nextTick(()=>{
+                    this.to_back()
                 })
             },
-            enhance_to_crop_page() {
-                this.$router.push({
-                    path: '/CropperImage',
-                    query: {
-                        type: 'denoise',
-                        img: this.enhancement,
-                        original: 0,
-                    }
-                });
+            to_bottom(){
+                var height = document.body.clientHeight;
+                window.scroll({ top: height*3, left: 0, behavior: 'smooth' });
+            },
+            to_back() {
+                var height = document.body.clientHeight;
+                window.scroll({ top: height, left: 0, behavior: 'smooth' });
             }
         },
     }
