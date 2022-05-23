@@ -58,7 +58,7 @@
             </template>
             <a-card-meta title="Reflection Model"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 14%; margin-left: 18%" id="result1">
+        <a-card hoverable style="width: 14%; margin-left: 18.2%" id="result1">
             <template #cover>
                 <img :src=result1 ref="image" />
             </template>
@@ -98,7 +98,7 @@
             </template>
             <a-card-meta title="Haze Map"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 14%; margin-left: 18%; margin-top: 3%;" id="enhancement">
+        <a-card hoverable style="width: 14%; margin-left: 18.2%; margin-top: 3%;" id="enhancement">
             <template #cover>
                 <img :src=enhancement ref="image" />
             </template>
@@ -110,6 +110,17 @@
         <a-typography-title :strong="true" style="margin-left: 42%; margin-bottom: 4%">Crop Image</a-typography-title>
         <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
     </div>
+
+    <a-modal
+            v-model:visible="modal_visible"
+            title="Algorithm is running"
+            :closable="false"
+            :maskClosable="false"
+            :keyboard="false"
+            footer=""
+    >
+        <a-spin style="margin-left: 50%" />
+    </a-modal>
 
 </template>
 
@@ -127,6 +138,7 @@
         data() {
             return {
                 show: false,
+                modal_visible: false,
                 lineContainers: [null, null, null, null, null, null, null, null, null, null, null],
                 crop_img: null,
                 img_type: null,
@@ -202,6 +214,7 @@
             },
             enhance() {
                 let _this = this;
+                this.modal_visible = true;
                 axios.get('http://127.0.0.1:5590/enlight')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/low_light_enhancement/enhancement.png' + '?t=' + new Date().getTime();
@@ -210,6 +223,7 @@
                         _this.dense_map = 'http://127.0.0.1:5590/static/low_light_enhancement/dense_map.png' + '?t=' + new Date().getTime();
                         _this.result1 = 'http://127.0.0.1:5590/static/low_light_enhancement/result1.png' + '?t=' + new Date().getTime();
                         _this.result = 'http://127.0.0.1:5590/static/low_light_enhancement/result2.png' + '?t=' + new Date().getTime();
+                        _this.modal_visible = false;
                     });
                 this.line_remove();
             },

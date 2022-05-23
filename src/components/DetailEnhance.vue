@@ -105,6 +105,17 @@
         <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
     </div>
 
+    <a-modal
+            v-model:visible="modal_visible"
+            title="Algorithm is running"
+            :closable="false"
+            :maskClosable="false"
+            :keyboard="false"
+            footer=""
+    >
+        <a-spin style="margin-left: 50%" />
+    </a-modal>
+
 </template>
 
 <script>
@@ -123,10 +134,12 @@
         data() {
             return {
                 show: false,
+                modal_visible: false,
                 lineContainers: [null, null, null, null, null, null, null, null],
                 crop_img: null,
                 img_type: null,
                 enhance_type: null,
+
                 rgb: 'http://127.0.0.1:5590/static/detail_enhancement/rgb.png',
                 nir: 'http://127.0.0.1:5590/static/detail_enhancement/nir.png',
                 enhancement: 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png',
@@ -167,6 +180,7 @@
             },
             enhance() {
                 let _this = this;
+                this.modal_visible = true;
                 axios.get('http://127.0.0.1:5590/enhancement')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/detail_enhancement/enhancement.png' + '?t=' + new Date().getTime();
@@ -174,6 +188,7 @@
                         _this.r_gradient_map = 'http://127.0.0.1:5590/static/detail_enhancement/r_gradient_map.png' + '?t=' + new Date().getTime();
                         _this.r_transmission_weight = 'http://127.0.0.1:5590/static/detail_enhancement/r_transmission_weight.png' + '?t=' + new Date().getTime();
                         _this.init_fusion = 'http://127.0.0.1:5590/static/detail_enhancement/init_fusion.png' + '?t=' + new Date().getTime();
+                        _this.modal_visible = false;
                     });
                 this.line_remove();
             },

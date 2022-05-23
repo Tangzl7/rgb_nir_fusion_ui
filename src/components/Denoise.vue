@@ -99,6 +99,17 @@
         <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
     </div>
 
+    <a-modal
+            v-model:visible="modal_visible"
+            title="Algorithm is running"
+            :closable="false"
+            :maskClosable="false"
+            :keyboard="false"
+            footer=""
+    >
+        <a-spin style="margin-left: 50%" />
+    </a-modal>
+
 </template>
 
 <script>
@@ -115,6 +126,7 @@
         data() {
             return {
                 show: false,
+                modal_visible: false,
                 lineContainers: [null, null, null, null, null, null, null],
                 crop_img: null,
                 img_type: null,
@@ -184,12 +196,14 @@
             },
             enhance() {
                 let _this = this;
+                this.modal_visible = true;
                 axios.get('http://127.0.0.1:5590/denoise')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/denoise/enhancement.png' + '?t=' + new Date().getTime();
                         _this.base = 'http://127.0.0.1:5590/static/denoise/base.png' + '?t=' + new Date().getTime();
                         _this.noise_reduce = 'http://127.0.0.1:5590/static/denoise/noise_reduce.png' + '?t=' + new Date().getTime();
                         _this.detail = 'http://127.0.0.1:5590/static/denoise/detail.png' + '?t=' + new Date().getTime();
+                        _this.modal_visible = false;
                     });
                 this.line_remove();
             },

@@ -84,7 +84,7 @@
             </template>
             <a-card-meta title="Blurred NIR Image"></a-card-meta>
         </a-card>
-        <a-card hoverable style="width: 16%; margin-top: 5%; margin-left: 26%" id="enhancement">
+        <a-card hoverable style="width: 16%; margin-top: 5%; margin-left: 26.2%" id="enhancement">
             <template #cover>
                 <img alt="fusion result" :src=enhancement ref="image" />
             </template>
@@ -96,6 +96,17 @@
         <a-typography-title :strong="true" style="margin-left: 42%; margin-bottom: 4%">Crop Image</a-typography-title>
         <CropperImage :crop_img="crop_img" :img_type="img_type" :enhance_type="enhance_type" :back_home="back_home"></CropperImage>
     </div>
+
+    <a-modal
+            v-model:visible="modal_visible"
+            title="Algorithm is running"
+            :closable="false"
+            :maskClosable="false"
+            :keyboard="false"
+            footer=""
+    >
+        <a-spin style="margin-left: 50%" />
+    </a-modal>
 
 </template>
 
@@ -113,6 +124,7 @@
         data() {
             return {
                 show: false,
+                modal_visible: false,
                 lineContainers: [null, null, null, null, null],
                 crop_img: null,
                 img_type: null,
@@ -174,12 +186,14 @@
             },
             enhance() {
                 let _this = this;
+                this.modal_visible = true;
                 axios.get('http://127.0.0.1:5590/deblur')
                     .then(function () {
                         _this.enhancement = 'http://127.0.0.1:5590/static/deblur/enhancement.png' + '?t=' + new Date().getTime();
                         _this.blurred_nir = 'http://127.0.0.1:5590/static/deblur/blurred_nir.png' + '?t=' + new Date().getTime();
                         _this.slope = 'http://127.0.0.1:5590/static/deblur/slope.png' + '?t=' + new Date().getTime();
                         _this.offset = 'http://127.0.0.1:5590/static/deblur/offset.png' + '?t=' + new Date().getTime();
+                        _this.modal_visible = false;
                     });
                 this.line_remove();
             },
